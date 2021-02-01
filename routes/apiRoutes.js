@@ -35,9 +35,22 @@ router.post("/api/workouts", ({ body }, res) => {
 router.put("/api/workouts/:id", ({body, params}) => {
     Workout.findById(params.id)
     .then(workout => {
-        res.json(dbWorkout);
+        console.log(workout);
+        const newtotalduration = body.duration + workout.totalDuration;
+        Workout.updateOne({ "_id": params.id },
+            {
+                $push: {
+                    exercises: body
+                },
+                totalDuration: newtotalduration
+            })
+            .then(dbWorkout => {
+                res.json(dbWorkout);
+            })
+            .catch(err => {
+                res.status(400).json(err);
+            });
     })
-    .catch(err => {
-        res.status(400).json(err);
-    });
 });
+
+module.exports = router;
